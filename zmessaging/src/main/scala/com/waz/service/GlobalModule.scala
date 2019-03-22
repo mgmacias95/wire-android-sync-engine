@@ -56,7 +56,6 @@ trait GlobalModule {
   def syncRequests:             SyncRequestService
   def syncHandler:              SyncHandler
 
-  def ssoService:               SSOService
   def tokenService:             GlobalTokenService
   def notificationsUi:          NotificationUiController
   def accountsService:          AccountsService
@@ -119,7 +118,6 @@ class GlobalModuleImpl(val context:                 AContext,
   val storage:                  Database                         = new GlobalDatabase(context, tracking = trackingService)
   val accountsStorageOld:       AccountsStorageOld               = wire[AccountsStorageOldImpl]
 
-  lazy val ssoService:          SSOService                       = wire[SSOService]
   lazy val accountsService:     AccountsService                  = new AccountsServiceImpl(this)
   lazy val syncHandler:         SyncHandler                      = new AccountSyncHandler(accountsService)
   lazy val calling:             GlobalCallingService             = new GlobalCallingService
@@ -183,7 +181,6 @@ class EmptyGlobalModule extends GlobalModule {
   override def trackingService:          TrackingService                                     = ???
   override def context:                  AContext                                            = ???
   override def backend:                  BackendConfig                                       = ???
-  override def ssoService:               SSOService                                          = ???
   override def tokenService:             GlobalTokenServiceImpl                              = ???
   override def notificationsUi:          NotificationUiController                            = ???
   override def calling:                  GlobalCallingService                                = ???

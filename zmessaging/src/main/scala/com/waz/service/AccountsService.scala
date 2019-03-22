@@ -18,6 +18,7 @@
 package com.waz.service
 
 import java.io.File
+import java.util.UUID
 
 import com.waz.log.LogSE._
 import com.waz.api.impl.ErrorResponse
@@ -102,6 +103,7 @@ trait AccountsService {
   def activeZms:            Signal[Option[ZMessaging]]
 
   def loginClient: LoginClient
+  def verifySSOToken(token: UUID): ErrorOr[Boolean]
 }
 
 object AccountsService {
@@ -485,5 +487,7 @@ class AccountsServiceImpl(val global: GlobalModule) extends AccountsService with
         Future.successful(Left(error))
     }
   }
+
+  override def verifySSOToken(token: UUID): ErrorOr[Boolean] = loginClient.verifySSOToken(token)
 }
 
