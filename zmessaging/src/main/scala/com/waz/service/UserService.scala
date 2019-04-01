@@ -17,9 +17,9 @@
  */
 package com.waz.service
 
-import com.waz.ZLog.ImplicitTag._
+import com.waz.log.LogSE._
 import com.waz.content._
-import com.waz.log.ZLog2._
+import com.waz.log.BasicLogging.LogTag.DerivedLogTag
 import com.waz.model.AccountData.Password
 import com.waz.model.UserData.ConnectionStatus
 import com.waz.model.{AccentColor, _}
@@ -52,6 +52,7 @@ trait UserService {
   def currentConvMembers: Signal[Set[UserId]]
 
   def getSelfUser: Future[Option[UserData]]
+  def findUser(id: UserId): Future[Option[UserData]]
   def getOrCreateUser(id: UserId): Future[UserData]
   def updateUserData(id: UserId, updater: UserData => UserData): Future[Option[(UserData, UserData)]]
   def syncIfNeeded(userIds: Set[UserId], olderThan: FiniteDuration = SyncIfOlderThan): Future[Option[SyncId]]
@@ -95,7 +96,7 @@ class UserServiceImpl(selfUserId:        UserId,
                       sync:              SyncServiceHandle,
                       assetsStorage:     AssetsStorage,
                       credentialsClient: CredentialsUpdateClient,
-                      selectedConv:      SelectedConversationService) extends UserService {
+                      selectedConv:      SelectedConversationService) extends UserService with DerivedLogTag {
 
   import Threading.Implicits.Background
   private implicit val ec = EventContext.Global
@@ -160,6 +161,8 @@ class UserServiceImpl(selfUserId:        UserId,
         accu -- toRemove.map(_.id) ++ toAdd.map(u => u.id -> u)
       }
     )
+
+  override def findUser(id: UserId): Future[Option[UserData]] = usersStorage.get(id)
 
   override def getOrCreateUser(id: UserId) = usersStorage.getOrElseUpdate(id, {
     sync.syncUsers(Set(id))
@@ -350,7 +353,7 @@ class ExpiredUsersService(push:         PushService,
                           members:      MembersStorage,
                           users:        UserService,
                           usersStorage: UsersStorage,
-                          sync:         SyncServiceHandle)(implicit ev: AccountContext) {
+                          sync:         SyncServiceHandle)(implicit ev: AccountContext) extends DerivedLogTag {
 
   private implicit val ec = new SerialDispatchQueue(name = "ExpiringUsers")
 

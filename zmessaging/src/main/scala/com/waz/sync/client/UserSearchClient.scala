@@ -17,9 +17,9 @@
  */
 package com.waz.sync.client
 
-import com.waz.ZLog.ImplicitTag._
 import com.waz.api.impl.ErrorResponse
-import com.waz.log.ZLog2._
+import com.waz.log.BasicLogging.LogTag.DerivedLogTag
+import com.waz.log.LogSE._
 import com.waz.model.SearchQuery.{Recommended, RecommendedHandle, TopPeople}
 import com.waz.model._
 import com.waz.sync.client.UserSearchClient.{DefaultLimit, UserSearchResponse}
@@ -37,7 +37,10 @@ trait UserSearchClient {
 class UserSearchClientImpl(implicit
                            urlCreator: UrlCreator,
                            httpClient: HttpClient,
-                           authRequestInterceptor: AuthRequestInterceptor) extends UserSearchClient with CirceJSONSupport {
+                           authRequestInterceptor: AuthRequestInterceptor)
+  extends UserSearchClient
+    with CirceJSONSupport
+    with DerivedLogTag {
 
   import HttpClient.AutoDerivation._
   import HttpClient.dsl._
@@ -85,7 +88,7 @@ class UserSearchClientImpl(implicit
   }
 }
 
-object UserSearchClient {
+object UserSearchClient extends DerivedLogTag {
   val ContactsPath = "/search/contacts"
   val HandlesPath = "/users/handles"
 
