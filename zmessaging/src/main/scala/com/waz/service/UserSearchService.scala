@@ -260,7 +260,7 @@ class UserSearchService(selfUserId:           UserId,
     def updating(ids: Vector[UserId])(cached: SearchQueryCache) =
       cached.copy(query, clock.instant(), if (ids.nonEmpty || cached.entries.isEmpty) Some(ids) else cached.entries)
 
-    val users = unpack(results)
+    val users = unapply(results)
     val ids = users.map(_.id)(breakOut): Vector[UserId]
 
     for {
@@ -364,7 +364,7 @@ object UserSearchService {
   /**
     * Extracts `UserSearchEntry` objects contained within the given search response.
     */
-  def unpack(response: UserSearchResponse): Seq[UserSearchEntry] = {
+  def unapply(response: UserSearchResponse): Seq[UserSearchEntry] = {
     response.documents.map(UserSearchEntry.apply)
   }
 }
